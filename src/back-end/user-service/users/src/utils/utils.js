@@ -65,6 +65,7 @@ function getUserLevel(token) {
 function createUser(username, password) {
   return new Promise((resolve, reject) => {
     // Check if username and password are provided
+    log("pass1")
     if (!username || !password) {
       reject('Username and password are required.');
       return;
@@ -72,7 +73,6 @@ function createUser(username, password) {
     // Check if it's the first user creation -> if yes, the user will be an admin
     users.list({ limit: 1 }) 
     .then(result => {
-
       var isFirstUser = result && result.rows.length === 0;
       
       // Check if the new user already exists
@@ -83,33 +83,28 @@ function createUser(username, password) {
       })
       .catch(error => {
         if (!(error.statusCode === 404)) {
+          log("pass6")
           reject(`Can't check if user exist`);
           return;
-        } 
-          
-      });
-      
-      // Create the new user
-      users.insert({ 
-        'passw': bcrypt.hashSync(username, bcrypt.genSaltSync()),
-        'isAdmin': isFirstUser
-      }, username)
-      .then(result => {
-        var token = tku.encodeToken(username)
-        resolve(token)
-        });      
+        } else {
+              // Create the new user
+          users.insert({ 'passw': bcrypt.hashSync(username, bcrypt.genSaltSync()),'isAdmin': isFirstUser}, username)
+          .then(result => {
+            var token = tku.encodeToken(username)
+            resolve(token)     
+          })
+          .catch(error => {
+            reject(`Can't add the new user. Details: ${error}.`);
+            return;
+          });
+        }
       })
-      .catch(error => {
-        reject(`Can't add the new user. Details: ${error}.`);
-        return;
-      });
-        
     })
     .catch(error => {
       reject(`Error checking existing users. Reason: ${error.reason}.`);
       return;
     });
-    
+  })
 }
 
 
@@ -142,30 +137,29 @@ function setAdmin(token, targetUser) {
       if (result != 2) {
         reject("User is not admin");
         return;
+      } else {
+          // Récupérer l'utilisateur cible de la base de données
+        users.get(targetUser)
+        .then(result => {
+          const userDoc = result;
+          // Mettre à jour l'utilisateur cible comme administrateur
+          userDoc.isAdmin = true;
+          // Enregistrer les modifications dans la base de données
+          users.insert(userDoc)
+          .then(result => {
+            resolve(true);
+          })
+          .catch(error => {
+            reject(`Erreur lors de la mise à jour de l'utilisateur: ${error}`);
+          });
+        })
+        .catch(error => {
+          reject(`Can't find user [${targetUser}] in the database. Details : ${error}`);
+        });
       }
     })
     .catch(error => {
         reject(error);
-        return;
-    });
-    
-    // Récupérer l'utilisateur cible de la base de données
-    users.get(targetUser)
-    .then(result => {
-      const userDoc = result;
-      // Mettre à jour l'utilisateur cible comme administrateur
-      userDoc.isAdmin = true;
-      // Enregistrer les modifications dans la base de données
-      users.insert(userDoc)
-      .then(result => {
-        resolve(true);
-      })
-      .catch(error => {
-        reject(`Erreur lors de la mise à jour de l'utilisateur: ${error}`);
-      });
-    })
-    .catch(error => {
-      reject(`Can't find user [${targetUser}] in the database. Details : ${error}`);
     }); 
   })
 };
