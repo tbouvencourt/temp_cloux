@@ -10,6 +10,7 @@ function createUserStore() {
     return {
         subscribe,
         update,
+        set,
         register: (username, password) => {
             return new Promise((resolve, reject) => {
                 axios.post(`${url}/user/create/`, { username, password })
