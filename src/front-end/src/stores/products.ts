@@ -1,10 +1,19 @@
 import { derived, writable } from 'svelte/store';
+import axios from "axios";
 
-export const products = createProducts();
+
+const url = "http://192.168.56.103";
+
+export const products = createDynamicProducts();
 
 function createProducts() {
-	const { subscribe, set, update } = writable(staticCatalog());
+	let temp;
+	dynamicCatalog().then((items) => {
+		console.log(items); // Affiche les items dans la console
+		temp=items;
+	});
 
+	const { subscribe, set, update } = writable(staticCatalog());
 	return {
 		subscribe,
 		update,
@@ -18,6 +27,43 @@ function createProducts() {
 				return oldProducts;
 			})
 	};
+}
+
+function createDynamicProducts() {
+	const { subscribe, set, update } = writable([]);
+
+	dynamicCatalog().then((items) => {
+		console.log(items); // Affiche les items dans la console
+		set(items);
+	});
+	
+	return {
+		subscribe,
+		update,
+		set,
+		__addProduct: (product) =>
+			update((oldProducts) => {
+				var id_hash = crypto.randomUUID();
+				if (!(product.category in oldProducts)) {
+					oldProducts[product.category] = [];
+				}
+				oldProducts[product.category].push({ ...product, id: id_hash  });
+				return oldProducts;
+			})
+	};
+}
+
+
+
+function dynamicCatalog() {
+    	return axios
+        .get(`${url}/product/items/`)
+        .then((res) => {
+            return res.data.items;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 }
 function staticCatalog() {
 	return {
@@ -92,6 +138,11 @@ function staticCatalog() {
 	};
 }
 
+ 
+
+
+
 export const productsMerged = derived(products, ($products) => {
 	return Object.values($products).flat();
 });
+

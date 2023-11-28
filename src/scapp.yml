@@ -95,6 +95,26 @@ services:     # list all services for your application
       restart_policy:
         condition: on-failure
     networks: [ "scapp-net" ]
+    
+    # database of product-service
+  product-db:
+    # image name
+    image: klaertus/kv-storage-system:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
+
+  # product service   
+  product-service:
+    image: scapp-product
+    depends_on: [ "product-db" ]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
   
 networks:
   scapp-net:

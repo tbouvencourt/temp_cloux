@@ -5,7 +5,7 @@
 	import axios from "axios";
 
 	let prevCheckout: any[];
-	const url = "http://192.168.1.36";
+	const url = "http://192.168.56.103";
 
 	onMount(async () => {
 		getCheckout();

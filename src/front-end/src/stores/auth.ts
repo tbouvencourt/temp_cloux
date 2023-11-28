@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { cart } from '@stores/cart';
 import axios from 'axios';
 
-const url = "http://192.168.1.36";
+const url = "http://192.168.56.103";
 
 function createUserStore() {
     const { subscribe, set, update } = writable({ isLogged: false, isAdmin: false, token: null });
@@ -10,6 +10,7 @@ function createUserStore() {
     return {
         subscribe,
         update,
+        set,
         register: (username, password) => {
             return new Promise((resolve, reject) => {
                 axios.post(`${url}/user/create/`, { username, password })

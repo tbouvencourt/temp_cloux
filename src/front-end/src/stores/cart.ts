@@ -2,7 +2,7 @@ import { derived, writable } from 'svelte/store';
 
 import axios from "axios";
 
-const url = "http://192.168.1.36";
+const url = "http://192.168.56.103";
 
 
 function createCart() {

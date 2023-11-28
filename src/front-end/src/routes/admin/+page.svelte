@@ -14,10 +14,12 @@
 		TableSearch
 	} from 'flowbite-svelte';
 
-
-
 	import { products, productsMerged } from '@stores/products';
 	import Modal from '@interfaces/misc/Modal.svelte';
+	import axios from "axios";
+    import { addToast } from '@stores/toasts';
+
+	const url = "http://192.168.56.103";
 
 	let modalProduct = null;
 	let searchTerm = '';
@@ -26,14 +28,6 @@
 	);
 	$: showUpdateModal = false;
 	$: showCreateModal = false;
-
-
-	    import axios from 'axios';
-
-    // Votre URL d'API
-    const url = "http://192.168.1.36";
-
- 
 
 	function displayUpdateModal(product) {
 		modalProduct = product;
@@ -46,31 +40,55 @@
 	}
 
 	function updateModalProduct() {
-		// Sanitize input
-		let index = $products[modalProduct.category].findIndex((prod) => prod.id == modalProduct.id);
-		$products[modalProduct.category][index] = modalProduct;
-		modalProduct = null;
-		showUpdateModal = false;
+		axios
+            .post(`${url}/product/updateItem`, { id: modalProduct.id, name: modalProduct.name, price: modalProduct.price, image: modalProduct.image})
+            .then((res) => {
+				let index = $products[modalProduct.category].findIndex((prod) => prod.id == modalProduct.id);
+				$products[modalProduct.category][index] = modalProduct;
+				modalProduct = null;
+				showUpdateModal = false;
+				})
+            .catch((error) => {
+                console.error(error);
+            });
 	}
 
 	function createProduct() {
-		products.__addProduct(modalProduct);
-		modalProduct = null;
+    axios
+        .post(`${url}/product/createItem`, {name: modalProduct.name, price: modalProduct.price, image: modalProduct.image, category: modalProduct.category })
+        .then((res) => {
+			console.log({name: modalProduct.name, price: modalProduct.price, image: modalProduct.image, category: modalProduct.category })
+            products.__addProduct(modalProduct);
+			products.update();
+            modalProduct = null;
+            showCreateModal = false;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 		showCreateModal = false;
-	}
+}
 
 	function deleteModalProduct() {
-		deleteProduct(modalProduct);
-	}
+        deleteProduct(modalProduct);
+    }
 
 	function deleteProduct(product) {
-		// This function deletes the product from the local store only.
-		let index = $products[product.category].findIndex((prod) => prod.id == product.id);
-		if (index == -1) return;
-		$products[product.category].splice(index, 1);
-		$products = $products; // This line is needed because Svelte's reactivity is triggered by assignment. Deleting an element of the array is not an assignment so we trigger one manually.
-		modalProduct = null;
-		showUpdateModal = false;
+		axios
+            .post(`${url}/product/delItem`, { id: product.id })
+            .then((res) => {
+				// This function deletes the product from the local store only.
+				let index = $products[product.category].findIndex((prod) => prod.id == product.id);
+				if (index == -1) return;
+				$products[product.category].splice(index, 1);
+				$products = $products; // This line is needed because Svelte's reactivity is triggered by assignment. Deleting an element of the array is not an assignment so we trigger one manually.
+				modalProduct = null;
+				showUpdateModal = false;
+					})
+            .catch((error) => {
+                console.error(error);
+            });
+		
 	}
 </script>
 
