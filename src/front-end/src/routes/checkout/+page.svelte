@@ -3,45 +3,14 @@
 	import { cart } from '@stores/cart';
 	import { onMount } from 'svelte';
 	import axios from "axios";
-
+	import { user } from '@stores/auth';
+	import { addToast } from '@stores/toasts';
 	let prevCheckout: any[];
-	const url = "http://192.168.56.103";
 
 	onMount(async () => {
-		getCheckout();
+		cart.getCheckout();
 		prevCheckout = JSON.parse(window.localStorage.getItem('checkout')) || [];
 	});
-
-	function getCheckout() {
-        return new Promise((resolve, reject) => {
-                axios.get(`${url}/order/get/`, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token} })
-                .then((res) => {
-					console.log(res.data.result)
-					window.localStorage.setItem('checkout', JSON.stringify(res.data.result));
-					goto('/checkout');
-                })
-                .catch((err) => {
-                    console.error(err);
-                    // Handle error, e.g., showing a toast notification
-                });
-            });
-    }
-
-	function createCheckout(checkout) {
-        return new Promise((resolve, reject) => {
-                axios.post(`${url}/order/create/`, {checkout:checkout}, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
-                .then((res) => {
-					window.sessionStorage.removeItem('cart');
-					cart.update((old) => []);
-					cart.updateRemote([])
-					getCheckout();
-                })
-                .catch((err) => {
-                    console.error(err);
-                    // Handle error, e.g., showing a toast notification
-                });
-            });
-    }
 
 	function handleCheckout() {
 		let checkout = {
@@ -52,7 +21,25 @@
 				date: new Date().toLocaleDateString('fr')
 			}
 		};
-		createCheckout(checkout)
+		cart.CreateCheckout(checkout)
+        .then((result) => {
+			cart.getCheckout();
+            addToast({
+              message: `Checkout created !`,
+              type: "success",
+              dismissible: true,
+              timeout: 3000,
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            addToast({
+              message: `Checkout failed. Details ${error}`,
+              type: "error",
+              dismissible: true,
+              timeout: 3000,
+            });
+        });
 	}
 </script>
 

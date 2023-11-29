@@ -2,7 +2,7 @@ import { derived, writable } from 'svelte/store';
 
 import axios from "axios";
 
-const url = "http://192.168.56.103";
+const url = "http://192.168.1.36";
 
 
 function createCart() {
@@ -28,6 +28,41 @@ function createCart() {
                 });
             });
         },
+        getCheckout: () => {
+            return new Promise((resolve, reject) => {
+                axios.get(`${url}/order/get/`, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token} })
+                .then((res) => {
+					console.log(res.data.result)
+					window.localStorage.setItem('checkout', JSON.stringify(res.data.result));
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+            })
+        },
+        CreateCheckout: (checkout) => {
+            return new Promise((resolve, reject) => {
+                axios.post(`${url}/order/create/`, {checkout:checkout}, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
+                .then((result) => {
+                        axios.put(`${url}/cart/update/`, {items:[]}, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
+                        .then((result) => {
+                            resolve("Cart updated succesfully");
+                            window.sessionStorage.removeItem('cart');
+					        update((old) => []);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            reject("Cant create checkout : update cart failed")
+                            // Handle error, e.g., showing a toast notification
+                        });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    reject("Cant create checkout")
+                    // Handle error, e.g., showing a toast notification
+                });
+            });
+        }, 
         cleanRemote: (items) => {
             return new Promise((resolve, reject) => {
                 axios.delete(`${url}/cart/remove/`, {items:items}, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })

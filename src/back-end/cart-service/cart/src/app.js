@@ -20,7 +20,7 @@ app.get('/cart/get/', (req, res) => {
     })
     .catch((error) => {
       utils.sendLog(token, service, "ERROR", operation, `Cart not retrieved. Info : ${error}`, 0)
-      res.status(404).json({ status: 'error', result: String(error)})
+      res.status(403).json({ status: 'error', result: String(error)})
     })
 });
 
@@ -41,23 +41,6 @@ app.post('/cart/create/', (req, res) => {
     })
 });
 
-app.delete('/cart/remove/', (req, res) => {
-  const token = req.query.token;
-  const itemId = req.body.itemId;
-
-  const operation = "RemoveItem"
-  utils.sendLog(token, service, "INFO", operation, `Removing item [${itemId}] from cart`, 0)
-
-  utils.removeFromCart(token, itemId)
-    .then(response => {
-      utils.sendLog(token, service, "INFO", operation, `Item [${itemId}] succesfully removed from cart`, 0)
-      res.status(200).json({ status: 'success', response });
-    })
-    .catch(error => {
-      utils.sendLog(token, service, "ERROR", operation, `Item [${itemId}] with quantity [${quantity}] not removed from the cart. Info : ${error}`, 0)
-      res.status(404).json({ status: 'error', message: String(error) });
-    });
-});
 
 app.put('/cart/update/', (req, res) => {
   const token = req.query.token;

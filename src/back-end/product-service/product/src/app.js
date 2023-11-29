@@ -1,48 +1,69 @@
 const express = require('express')
-const log = require('debug')('users-d')
+const log = require('debug')('product-d')
 
 const app = express.Router()
 const db = require('./utils/crud-wp')
 
+const service = "product-service"
+
 app.post('/product/createItem/', (req, res) => {
+  var token = req.query.token;
   var name = req.body.name
   var price = req.body.price
   var image = req.body.image
   var category = req.body.category
   
+  const operation = "CreateItem"
+  db.sendLog(token, service, "INFO", operation, `Create new item with attributes : ${name},${price},${image},${category}`, 0)
+
   //log(`Creating a new order (${order.}) identified with "${usrPassw}"`)
-  return db.createItem(name,price,image,category)
+  return db.createItem(token, name,price,image,category)
     .then((item) => {
+      db.sendLog(token, service, "INFO", operation, `Item with attributes : ${name},${price},${image},${category} successfully created`, 0)
       res.status(200).json({ status: 'success', item })
     })
-    .catch((err) => {
-      res.status(409).json({ status: 'error', message: String(err) })
+    .catch((error) => {
+      db.sendLog(token, service, "ERROR", operation, `Item with attributes : ${name},${price},${image},${category} doesn't created. Infos : ${error}`, 0)
+      res.status(403).json({ status: 'error', message: String(error) })
     })
 })
 
 app.post('/product/delItem/', (req, res) => {
+  var token = req.query.token;
   var id = req.body.id;
-    return db.deleteItem(id)
-        .then(() => {
-            res.status(200).json({ status: 'success', message: 'Item deleted successfully' });
-        })
-        .catch((err) => {
-            res.status(500).json({ status: 'error', message: String(err) });
-        });
+
+  const operation = "DeleteItem"
+  db.sendLog(token, service, "INFO", operation, `Delete item with id : ${id}`, 0)
+
+  return db.deleteItem(token, id)
+    .then(() => {
+      db.sendLog(token, service, "INFO", operation, `Delete item with id : ${id}`, 0)
+      res.status(200).json({ status: 'success', message: 'Item deleted successfully' });
+    })
+    .catch((error) => {
+      db.sendLog(token, service, "ERROR", operation, `Can't delete item with id : ${id}. Infos : ${error}`, 0)
+      res.status(403).json({ status: 'error', message: String(error) });
+    });
 });
 
 app.post('/product/updateItem/', (req, res) => {
+  var token = req.query.token;
   var id = req.body.id;
   var name = req.body.name;
   var price = req.body.price;
   var image = req.body.image;
 
-  return db.updateItem(id, name, price, image)
+  const operation = "UpdateItem"
+  db.sendLog(token, service, "INFO", operation, `Update item with id : ${id} with theses attributes : ${name},${price},${image}`, 0)
+
+  return db.updateItem(token, id, name, price, image)
     .then((result) => {
+      db.sendLog(token, service, "INFO", operation, `Successfully updated item with id : ${id} with theses attributes : ${name},${price},${image}`, 0)
       res.status(200).json({ status: 'success', message: 'Item updated successfully', result });
     })
-    .catch((err) => {
-      res.status(500).json({ status: 'error', message: String(err) });
+    .catch((error) => {
+      db.sendLog(token, service, "ERROR", operation, `Can't update item with id : ${id} with theses attributes : ${name},${price},${image}. Infos : ${error}`, 0)
+      res.status(403).json({ status: 'error', message: String(error) });
     });
 });
 
@@ -150,7 +171,7 @@ app.get('/product/items/', (req, res) => {
       res.status(200).json({ status: 'success', items: sortedItems})
     })
     .catch((err) => {
-      res.status(500).json({ status: 'error', message: String(err) })
+      res.status(403).json({ status: 'error', message: String(err) })
     })
 });
 

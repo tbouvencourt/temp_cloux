@@ -137,9 +137,9 @@ function setAdmin(token, targetUser) {
       if (result != 2) {
         reject("User is not admin");
         return;
-      } else {
-          // Récupérer l'utilisateur cible de la base de données
-        users.get(targetUser)
+      } 
+      // Récupérer l'utilisateur cible de la base de données
+      users.get(targetUser)
         .then(result => {
           const userDoc = result;
           // Mettre à jour l'utilisateur cible comme administrateur
@@ -156,7 +156,7 @@ function setAdmin(token, targetUser) {
         .catch(error => {
           reject(`Can't find user [${targetUser}] in the database. Details : ${error}`);
         });
-      }
+      
     })
     .catch(error => {
         reject(error);

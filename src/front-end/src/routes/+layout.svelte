@@ -33,6 +33,7 @@
 	});
 
 	function logout() {
+		window.localStorage.setItem('checkout', '');
 		user.logout()
 		cart.clean();
 		goto('/');

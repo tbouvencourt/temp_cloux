@@ -10,7 +10,6 @@ const service = "user-service"
 
 app.post('/user/create/', (req, res) => {
 
-  var token = req.query.token;
   var username = req.body.username
   var password = req.body.password
 
@@ -24,7 +23,7 @@ app.post('/user/create/', (req, res) => {
     })
     .catch((error) => {
       utils.sendLog(null, service, "ERROR", operation, `${username} not created. Details : ${error}`, 0)
-      res.status(402).json({ status: 'error', result:String(error)})
+      res.status(403).json({ status: 'error', result:String(error)})
     })
 })
 
@@ -44,7 +43,7 @@ app.post('/user/authenticate/', (req, res) => {
     })
     .catch((error) => {
       utils.sendLog(null, service, "ERROR", operation, `${username} not authentificated. Details : ${error}`, 0)
-      res.status(402).json({ status: 'error', result:String(error)})
+      res.status(403).json({ status: 'error', result:String(error)})
     })
 })
 
@@ -61,7 +60,7 @@ app.get('/user/validate/', (req, res) => {
     })
     .catch((error) => {
       log(error)
-      res.status(402).json({ status: 'error', result:String(error)})
+      res.status(403).json({ status: 'error', result:String(error)})
     })
 })
 
@@ -79,7 +78,7 @@ app.get('/user/level/', (req, res) => {
     .catch((error) => {
       //utils.sendLog(token, service, "INFO", operation, `Can't verifying user level. Details ${error}`, 0)
       log(error)
-      res.status(402).json({ status: 'error', result:String(error) })
+      res.status(403).json({ status: 'error', result:String(error) })
     })
 })
 

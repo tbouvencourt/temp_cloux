@@ -19,7 +19,7 @@
 	import axios from "axios";
     import { addToast } from '@stores/toasts';
 
-	const url = "http://192.168.56.103";
+	const url = "http://192.168.1.36";
 
 	let modalProduct = null;
 	let searchTerm = '';
@@ -41,7 +41,7 @@
 
 	function updateModalProduct() {
 		axios
-            .post(`${url}/product/updateItem`, { id: modalProduct.id, name: modalProduct.name, price: modalProduct.price, image: modalProduct.image})
+            .post(`${url}/product/updateItem/`, { id: modalProduct.id, name: modalProduct.name, price: modalProduct.price, image: modalProduct.image}, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token }})
             .then((res) => {
 				let index = $products[modalProduct.category].findIndex((prod) => prod.id == modalProduct.id);
 				$products[modalProduct.category][index] = modalProduct;
@@ -55,7 +55,7 @@
 
 	function createProduct() {
     axios
-        .post(`${url}/product/createItem`, {name: modalProduct.name, price: modalProduct.price, image: modalProduct.image, category: modalProduct.category })
+        .post(`${url}/product/createItem/`, {name: modalProduct.name, price: modalProduct.price, image: modalProduct.image, category: modalProduct.category }, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token }})
         .then((res) => {
 			console.log({name: modalProduct.name, price: modalProduct.price, image: modalProduct.image, category: modalProduct.category })
             products.__addProduct(modalProduct);
@@ -75,7 +75,7 @@
 
 	function deleteProduct(product) {
 		axios
-            .post(`${url}/product/delItem`, { id: product.id })
+            .post(`${url}/product/delItem/`, { id: product.id }, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token }})
             .then((res) => {
 				// This function deletes the product from the local store only.
 				let index = $products[product.category].findIndex((prod) => prod.id == product.id);

@@ -11,8 +11,8 @@ function getLog(token, username, level, type, service, operation){
   return new Promise((resolve, reject) => {
     axios.get(`${user_service}/user/level`, { params: { token:token}})
     .then(response => { 
-      let level = response
-      if (level != 2){
+      let leveluser = response
+      if (leveluser != 2){
         reject(new Error('User is not an admin'))
       }
       // Build a selector for the query based on non-null parameters

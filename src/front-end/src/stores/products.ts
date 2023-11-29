@@ -1,44 +1,24 @@
 import { derived, writable } from 'svelte/store';
 import axios from "axios";
+import { env } from "$env/dynamic/public";
 
 
-const url = "http://192.168.56.103";
+const url = "http://192.168.1.36";
 
-export const products = createDynamicProducts();
 
-function createProducts() {
-	let temp;
-	dynamicCatalog().then((items) => {
-		console.log(items); // Affiche les items dans la console
-		temp=items;
-	});
+export const products = createDynamicProducts(); // Export le catalogue
 
-	const { subscribe, set, update } = writable(staticCatalog());
-	return {
-		subscribe,
-		update,
-		set,
-		__addProduct: (product) =>
-			update((oldProducts) => {
-				if (!(product.category in oldProducts)) {
-					oldProducts[product.category] = [];
-				}
-				oldProducts[product.category].push({ ...product, id: crypto.randomUUID() });
-				return oldProducts;
-			})
-	};
-}
 
 function createDynamicProducts() {
-	const { subscribe, set, update } = writable([]);
+	const { subscribe, set, update } = writable([]); // Initialise le catalogue
 
-	dynamicCatalog().then((items) => {
+	dynamicCatalog().then((items) => { // Récupère les items
 		console.log(items); // Affiche les items dans la console
-		set(items);
+		set(items); // Initialise le catalogue avec les items récupérés
 	});
 	
-	return {
-		subscribe,
+	return { 
+		subscribe, 
 		update,
 		set,
 		__addProduct: (product) =>
@@ -48,18 +28,18 @@ function createDynamicProducts() {
 					oldProducts[product.category] = [];
 				}
 				oldProducts[product.category].push({ ...product, id: id_hash  });
-				return oldProducts;
+				return oldProducts; // Ajoute le produit au catalogue
 			})
 	};
 }
 
 
 
-function dynamicCatalog() {
+function dynamicCatalog() { 
     	return axios
-        .get(`${url}/product/items/`)
+        .get(`${url}/product/items/`) // Récupère les items
         .then((res) => {
-            return res.data.items;
+            return res.data.items; // Retourne les items
         })
         .catch((error) => {
             console.error(error);
