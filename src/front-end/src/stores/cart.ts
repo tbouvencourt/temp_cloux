@@ -42,9 +42,9 @@ function createCart() {
         },
         CreateCheckout: (checkout) => {
             return new Promise((resolve, reject) => {
-                axios.post(`${url}/order/create/`, {checkout:checkout}, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
+                axios.put(`${url}/cart/update/`, {items:[]}, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
                 .then((result) => {
-                        axios.put(`${url}/cart/update/`, {items:[]}, { params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
+                        axios.post(`${url}/order/create/`, {checkout:checkout}, {params: { token: JSON.parse(window.localStorage.getItem('auth')).token } })
                         .then((result) => {
                             resolve("Cart updated succesfully");
                             window.sessionStorage.removeItem('cart');
@@ -52,13 +52,13 @@ function createCart() {
                         })
                         .catch((error) => {
                             console.error(error);
-                            reject("Cant create checkout : update cart failed")
+                            reject("Cant create checkout")
                             // Handle error, e.g., showing a toast notification
                         });
                 })
                 .catch((error) => {
                     console.error(error);
-                    reject("Cant create checkout")
+                    reject("Cant create checkout : update cart failed")
                     // Handle error, e.g., showing a toast notification
                 });
             });
