@@ -52,6 +52,31 @@ function createItem (token, name,price,image,category) {
     
 }
 
+function initProduct(name,price,image,category){
+  return new Promise((resolve, reject) => {
+    var id = crypto.randomUUID();
+        db.insert(
+          // argument of nano.insert()
+          {
+            '_id': id,
+            'id': id,
+            'name': name,
+            'price': parseFloat(price),
+            'image': image,
+            'category': category,
+          },
+          // callback to execute once the request to the DB is complete
+          (error, success) => {
+            if (success) {
+              resolve(success)
+            } else {
+              reject(`In the creation of order. Details: ${error.reason}.`)
+            }
+          }
+        )
+    })
+}
+
 function deleteItem(token, id) {
   return new Promise((resolve, reject) => {
     axios.get(`${user_service}/user/level`, { params: { token:token}})
@@ -148,5 +173,6 @@ module.exports = {
   deleteItem,
   updateItem,
   sendLog,
+  initProduct,
 };
 

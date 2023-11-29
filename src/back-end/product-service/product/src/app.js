@@ -140,7 +140,7 @@ app.post('/product/initOrder/', (req, res) => {
 
   for (const category in data) {
       for (const item of data[category]) {
-          db.createItem(item.name, item.price, item.image, category)
+          db.initProduct(item.name, item.price, item.image, category)
               .then(success => console.log(success))
               .catch(error => console.error(error));
       }

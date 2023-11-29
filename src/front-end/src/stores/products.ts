@@ -9,6 +9,8 @@ const url = "http://192.168.1.36";
 export const products = createDynamicProducts(); // Export le catalogue
 
 
+
+
 function createDynamicProducts() {
 	const { subscribe, set, update } = writable([]); // Initialise le catalogue
 
