@@ -12,6 +12,7 @@ const expected = new Set([
 	'BODY_SIZE_LIMIT'
 ]);
 
+
 if ("") {
 	for (const name in process.env) {
 		if (name.startsWith("")) {
@@ -34,4 +35,4 @@ function env(name, fallback) {
 	return prefixed in process.env ? process.env[prefixed] : fallback;
 }
 
-export { env };
+export { env, backend };

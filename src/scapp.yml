@@ -13,6 +13,17 @@ services:     # list all services for your application
       replicas: 1
       restart_policy:
         condition: on-failure
+    depends_on:
+    - "product-db"
+    - "product-service"
+    - "user-db"
+    - "user-service"
+    - "cart-db"
+    - "cart-service"
+    - "log-db"
+    - "log-service"
+    - "order-db"
+    - "order-service"
     networks: [ "scapp-net" ]
 
   # database of user-service
@@ -109,12 +120,14 @@ services:     # list all services for your application
   # product service   
   product-service:
     image: scapp-product
-    depends_on: [ "product-db" ]
+    depends_on: [ "product-db"]
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
     networks: [ "scapp-net" ]
+
+
   
 networks:
   scapp-net:

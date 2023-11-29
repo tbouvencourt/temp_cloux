@@ -5,6 +5,7 @@ import axios from "axios";
 const url = "http://192.168.1.36";
 
 
+
 function createCart() {
 	const { subscribe, set, update } = writable([]);
 
@@ -12,6 +13,7 @@ function createCart() {
 	return {
 		subscribe,
 		update,
+        set,
         clean: () => {
             set([]); // Réinitialise le store à un tableau vide
         },

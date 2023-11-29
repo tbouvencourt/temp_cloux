@@ -2,7 +2,9 @@ import { writable } from 'svelte/store';
 import { cart } from '@stores/cart';
 import axios from 'axios';
 
+
 const url = "http://192.168.1.36";
+
 
 function createUserStore() {
     const { subscribe, set, update } = writable({ isLogged: false, isAdmin: false, token: null });
@@ -55,17 +57,9 @@ function createUserStore() {
                     const token = response.data.result;
                     axios.get(`${url}/user/level/`, { params: { token: token} })
                     .then((response) => {
-                        cart.getCheckout.create()
-                        .then((responseCart) => { 
-                            window.localStorage.setItem('auth', JSON.stringify({isAdmin : response.data.result === 2, isLogged: true, token: token }));
-                            set({isAdmin : response.data.result === 2, isLogged: true, token: token });
-                            resolve("success")
-                        })
-                        .catch((error) => {
-                            set({isAdmin : false, isLogged: false, token: null });
-                            reject('Cannot get user checkout history')
-                            console.error('Cannot get user checkout history. Details : ', error);
-                        });
+                        window.localStorage.setItem('auth', JSON.stringify({isAdmin : response.data.result === 2, isLogged: true, token: token }));
+                        set({isAdmin : response.data.result === 2, isLogged: true, token: token });
+                        resolve("success")
                     })
                     .catch((error) => {
                         set({isAdmin : false, isLogged: false, token: null });
